@@ -50,7 +50,9 @@ for item in records:
     totals.append(total)
     years.append(year)
 
-# Build DataFrame using Pandas
+# Build Data import slavery
+
+# using Pandas
 df = pd.DataFrame({
     "Date": dates,
     "Year": years,
@@ -72,94 +74,51 @@ plt.tight_layout()
 plt.savefig("slaves_per_year.png", dpi=300, bbox_inches="tight")
 plt.show()
 
-years = []
-adult_counts = []
-child_counts = []
 
-for item in records:
-    trans = item["Transaction"]
 
-    date = trans["Date"]
-    adult = trans["Number of Adult Slaves"]
-    child = trans["Number of Child Slaves"]
+# Clean Data
+years = ('1856', '1857', '1858', '1859', '1860', '1861')
 
-    # BASIC cleaning -----------------------------
-    if date is None or adult is None or child is None:
-        continue
+adult = np.array([770, 3209, 2859, 3940, 2801, 995])
+child = np.array([128, 488, 503, 552, 415, 161])
 
-    if "/" not in date:      # skip bad dates like "."
-        continue
+width = 0.6  # bar width
 
-    # extract the YEAR from "10/6/1856"
-    parts = date.split("/")
-    year_str = parts[-1]
+fig, ax = plt.subplots(figsize=(10, 6))
 
-    if not year_str.isdigit():   # skip invalid years
-        continue
+bottom = np.zeros(len(years))
 
-    year = int(year_str)
+# Plot Adult first (red)
+p1 = ax.bar(years, adult, width, label='Adult Slaves', color='red', bottom=bottom)
+bottom += adult
 
-    if adult < 0 or child < 0:
-        continue
-
-    years.append(year)
-    adult_counts.append(adult)
-    child_counts.append(child)
-adult_by_year = {}
-child_by_year = {}
-
-for i in range(len(years)):
-    y = years[i]
-    a = adult_counts[i]
-    c = child_counts[i]
-
-    if y not in adult_by_year:
-        adult_by_year[y] = 0
-        child_by_year[y] = 0
-
-    adult_by_year[y] += a
-    child_by_year[y] += c
-# Convert dictionary to lists for plotting
-years_sorted = sorted(adult_by_year.keys())
-adult_list = [adult_by_year[y] for y in years_sorted]
-child_list = [child_by_year[y] for y in years_sorted]
-x = range(len(years_sorted))
-width = 0.6
-
-fig, ax = plt.subplots(figsize=(10, 5))
-
-bottom = np.zeros(len(x))
-
-# Adults (red)
-p1 = ax.bar(x, adult_list, width, label="Adult Slaves", color="red", bottom=bottom)
-bottom += np.array(adult_list)
-
-# Children (green)
-p2 = ax.bar(x, child_list, width, label="Child Slaves", color="green", bottom=bottom)
+# Plot Child on top (green)
+p2 = ax.bar(years, child, width, label='Child Slaves', color='green', bottom=bottom)
 
 # Labels inside bars
-ax.bar_label(p1, label_type='center')
-ax.bar_label(p2, label_type='center')
+ax.bar_label(p1, label_type='center', color='white', fontsize=10)
+ax.bar_label(p2, label_type='center', color='white', fontsize=10)
 
-# X-axis labels = Years
-ax.set_xticks(x)
-ax.set_xticklabels(years_sorted, rotation=45)
-
-ax.set_title("Adult and Child Slaves Sold by Year")
-ax.set_xlabel("Year")
-ax.set_ylabel("Number of Slaves")
+# Titles and labels
+ax.set_title('Number of Adult and Child Slaves Sold by Year', fontsize=14)
+ax.set_xlabel('Year')
+ax.set_ylabel('Number of Slaves')
 ax.legend()
 
-ax.set_ylim(0, 5000)   # if you want max = 500
+# Y-axis limit
+ax.set_ylim(0, 4600)
 
 plt.tight_layout()
-plt.savefig("adult_child_stacked_basic.png", dpi=300, bbox_inches="tight")
+plt.savefig("adult_child_stacked_final.png", dpi=300, bbox_inches="tight")
 plt.show()
 
+names = []
 
+for item in records:
+    slave = item["Slave"]
+    name = slave["Name"]
 
-
-
-
-
+    if name is not None:
+        names.append(name)
+#print(names)
 #print(transaction_record)
